@@ -1,18 +1,17 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1>Quiz App</h1>
+    <quiz/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Quiz from './components/Quiz.vue'
 
 export default {
+  components: { Quiz },
   name: 'App',
-  components: {
-    HelloWorld
-  }
+  
 }
 </script>
 
@@ -23,6 +22,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin: 0;
+  line-height: 1.6;
 }
 </style>
