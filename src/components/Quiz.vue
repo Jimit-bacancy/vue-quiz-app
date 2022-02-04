@@ -1,5 +1,13 @@
 <template>
   <div class="container">
+    <div class="correctAnswers">
+      You have
+      <strong>{{ correctAnswers }} correct {{ pluralizeAnswer }}!</strong>
+    </div>
+    <div class="correctAnswers">
+      Currently at question {{ index + 1 }} of {{ questions.length }}
+    </div>
+
     <h1 v-html="loading ? 'Loading...' : currentQuestion.question"></h1>
     <!-- Only first question is displayed -->
     <form v-if="currentQuestion">
@@ -29,6 +37,74 @@ export default {
         return this.questions[this.index];
       }
       return null;
+    },
+    correctAnswers() {
+      if (this.questions && this.questions.length > 0) {
+        let streakCounter = 0;
+        this.questions.forEach(function (question) {
+          if (!question.rightAnswer) {
+            return;
+          } else if (question.rightAnswer === true) {
+            streakCounter++;
+          }
+        });
+        return streakCounter;
+      } else {
+        return "--";
+      }
+    },
+    pluralizeAnswer() {
+      // For grammatical correctness
+      return this.correctAnswers === 1 ? "Answer" : "Answers";
+    },
+    quizCompleted() {
+      if (this.questions.length === 0) {
+        return false;
+      }
+      /* Check if all questions have been answered */
+      let questionsAnswered = 0;
+      this.questions.forEach(function (question) {
+        question.rightAnswer !== null ? questionsAnswered++ : null;
+      });
+      return questionsAnswered === this.questions.length;
+    },
+    score() {
+      if (this.questions !== []) {
+        return {
+          allQuestions: this.questions.length,
+          answeredQuestions: this.questions.reduce((count, currentQuestion) => {
+            if (currentQuestion.userAnswer) {
+              // userAnswer is set when user has answered a question, no matter if right or wrong
+              count++;
+            }
+            return count;
+          }, 0),
+          correctlyAnsweredQuestions: this.questions.reduce(
+            (count, currentQuestion) => {
+              if (currentQuestion.rightAnswer) {
+                // rightAnswer is true, if user answered correctly
+                count++;
+              }
+              return count;
+            },
+            0
+          ),
+        };
+      } else {
+        return {
+          allQuestions: 0,
+          answeredQuestions: 0,
+          correctlyAnsweredQuestions: 0,
+        };
+      }
+    },
+  },
+  watch: {
+    quizCompleted(completed) {
+      completed &&
+        setTimeout(() => {
+          this.$emit("quiz-completed", this.score);
+        }, 3000);
     },
   },
   methods: {
@@ -147,6 +223,7 @@ button:hover:enabled {
   transform: scale(1.02);
   box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12),
     0 3px 1px -1px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 button:focus {
   outline: none;

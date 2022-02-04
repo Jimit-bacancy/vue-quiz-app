@@ -1,18 +1,47 @@
 <template>
   <div id="app">
     <h1>Quiz App</h1>
-    <quiz/>
+    <quiz @quiz-completed="handleQuizCompleted" :key="quizKey" />
+    <custom-modal
+      v-show="showModal"
+      header="Congratulations!"
+      subheader="You've completed your Quiz!"
+      :score="score"
+      @reload="updateQuiz"
+      @close="showModal = false"
+    />
   </div>
 </template>
 
 <script>
-import Quiz from './components/Quiz.vue'
+import CustomModal from "./components/CustomModal.vue";
+import Quiz from "./components/Quiz.vue";
 
 export default {
-  components: { Quiz },
-  name: 'App',
-  
-}
+  components: { Quiz, CustomModal },
+  name: "App",
+  data() {
+    return {
+      quizKey: 0,
+      showModal: false,
+      score: {
+        allQuestions: 0,
+        answeredQuestions: 0,
+        correctlyAnsweredQuestions: 0,
+      },
+    };
+  },
+  methods: {
+    handleQuizCompleted(score) {
+      this.score = score;
+      this.showModal = true;
+    },
+    updateQuiz() {
+      this.showModal = false;
+      this.quizKey++;
+    },
+  },
+};
 </script>
 
 <style>
